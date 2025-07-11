@@ -1,0 +1,6 @@
+name: st_schemaini
+channels:
+  - conda-forge
+dependencies:
+  - python==3.12.11
+  - streamlit==1.46.0
