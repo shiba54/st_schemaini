@@ -149,6 +149,22 @@ def form_schemaini(
     return content
 
 
+def add_row() -> None:
+    """
+    add row to df_cols
+    """
+    data_row = {
+        'Coln': [st.session_state['df_cols']['Coln'].max() + 1],
+        'name': [''],
+        'type': [''],
+        'width': [np.nan]
+    }
+    df_row = pd.DataFrame(data_row)
+    df_cols = pd.concat([st.session_state['df_cols'], df_row])
+    df_cols = df_cols.reset_index(drop=True)
+    st.session_state['df_cols'] = df_cols
+
+
 def main():
     st.set_page_config(
         page_title='Schemaini',
@@ -295,19 +311,16 @@ def main():
                 args=('edited_cols', 'df_cols')
             )
 
-            if st.button(label=':material/add:'):
-                # Add row to df_cols
-                data_row = {
-                    'Coln': [st.session_state['df_cols']['Coln'].max() + 1],
-                    'name': [''],
-                    'type': [''],
-                    'width': [np.nan]
-                }
-                df_row = pd.DataFrame(data_row)
-                df_cols = pd.concat([st.session_state['df_cols'], df_row])
-                df_cols = df_cols.reset_index(drop=True)
-                st.session_state['df_cols'] = df_cols
-                st.rerun()
+            col1, col2 = st.columns([0.15, 0.85])
+            with col1:
+                if st.button(label=':material/add: 1'):
+                    add_row()
+                    st.rerun()
+            with col2:
+                if st.button(label=':material/add: 10'):
+                    for _ in range(10):
+                        add_row()
+                    st.rerun()
 
             # Options
             st.write(':material/Check: オプション')
