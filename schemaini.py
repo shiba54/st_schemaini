@@ -179,151 +179,151 @@ def main():
     with col_input:
         st.write(':memo: テキストファイルの情報を入力してください')
 
-        # File name
-        st.write(':material/Check: ファイル名')
-        col1, col2, col3 = st.columns(
-            [0.75, 0.05, 0.2],
-            vertical_alignment='bottom'
-        )
-
-        with col1:
-            stem = st.text_input(
-                label='_',
-                value='name',
-                label_visibility='collapsed'
+        with st.container(border=True):
+            # File name
+            col1, col2, col3 = st.columns(
+                [0.75, 0.05, 0.2],
+                vertical_alignment='bottom'
             )
 
-        with col2:
-            st.write('.')
-
-        with col3:
-            ext = st.text_input(
-                label='_',
-                value='csv',
-                label_visibility='collapsed'
-            )
-        filename = f"{stem}.{ext}"
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            # File format
-            st.write(':material/Check: フォーマット')
-            fileformat = st.radio(
-                label='_',
-                options=list(FileFormat),
-                format_func=lambda x: x.get_jpname(),
-                label_visibility='collapsed'
-            )
-            if fileformat == fileformat.custom:
-                delimit = st.text_input(
-                    label='区切り文字',
-                    value='',
-                    max_chars=1
-                )
-                if delimit == '"':
-                    st.error('二重引用符 (") は使用できません')
-                    delimit = ' '
-                fileformat_specifier = fileformat.get_specifier(delimit)
-            else:
-                fileformat_specifier = fileformat.get_specifier()
-
-        with col2:
-            # Header
-            st.write(':material/Check: ヘッダ')
-            is_header = st.radio(
-                label='_',
-                options=[True, False],
-                format_func=lambda x: 'あり' if x else 'なし',
-                label_visibility='collapsed'
-            )
-
-        # Column type
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.write(':material/Check: カラムの設定')
-
-        with col2:
-            if is_header:
-                is_scan_rows = st.toggle(
-                    label='データから型を判定',
-                    value=False
-                )
-            else:
-                is_scan_rows = False
-
-            max_scan_rows = 0
-            if is_scan_rows:
-                max_scan_rows = st.number_input(
-                    label='読み取る行数',
-                    min_value=0,
-                    value=0,
-                    step=1,
-                    help='0 で全行を読み取り'
-                )
-
-        if not is_scan_rows:
-            column_config_cols = {
-                'Coln': st.column_config.NumberColumn(
-                    label='番号',
-                    disabled=True,
-                    required=True,
-                    format='Col%d',
-                    min_value=1,
-                    step=1
-                ),
-                'name': st.column_config.TextColumn(
-                    label='名称'
-                ),
-                'type': st.column_config.SelectboxColumn(
-                    label='型',
-                    options=[type.value for type in list(ColType)]
-                ),
-                'width': st.column_config.NumberColumn(
-                    label='長さ',
-                    min_value=1,
-                    step=1,
-                    help='固定長ファイルでは必須'
-                ),
-            }
-
-            if 'df_cols' not in st.session_state:
-                # Set df_cols in session_state
-                initial_rows = 10
-                data_cols = {
-                    'Coln': [i for i in range(1, initial_rows + 1)],
-                    'name': ['' for _ in range(initial_rows)],
-                    'type': ['' for _ in range(initial_rows)],
-                    'width': [np.nan for _ in range(initial_rows)]
-                }
-                df_cols = pd.DataFrame(data_cols)
-                df_cols.loc[0, ['name', 'type']] = ['sample', 'Long']
-                st.session_state['df_cols'] = df_cols
-
-            st.data_editor(
-                data=st.session_state['df_cols'],
-                hide_index=True,
-                column_config=column_config_cols,
-                num_rows='fixed',
-                key='edited_cols',
-                on_change=callback_apply_edited_rows,
-                args=('edited_cols', 'df_cols')
-            )
-
-            col1, col2 = st.columns([0.15, 0.85])
             with col1:
-                if st.button(label=':material/add: 1'):
-                    add_row()
-                    st.rerun()
-            with col2:
-                if st.button(label=':material/add: 10'):
-                    for _ in range(10):
-                        add_row()
-                    st.rerun()
+                stem = st.text_input(
+                    label='ファイル名',
+                    value='name'
+                )
 
+            with col2:
+                st.write('.')
+
+            with col3:
+                ext = st.text_input(
+                    label='_',
+                    value='csv',
+                    label_visibility='collapsed'
+                )
+            filename = f"{stem}.{ext}"
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            with st.container(border=True):
+                # File format
+                fileformat = st.radio(
+                    label='フォーマット',
+                    options=list(FileFormat),
+                    format_func=lambda x: x.get_jpname()
+                )
+                if fileformat == fileformat.custom:
+                    delimit = st.text_input(
+                        label='区切り文字',
+                        value='',
+                        max_chars=1
+                    )
+                    if delimit == '"':
+                        st.error('二重引用符 (") は使用できません')
+                        delimit = ' '
+                    fileformat_specifier = fileformat.get_specifier(delimit)
+                else:
+                    fileformat_specifier = fileformat.get_specifier()
+
+        with col2:
+            with st.container(border=True):
+                # Header
+                is_header = st.radio(
+                    label='ヘッダ',
+                    options=[True, False],
+                    format_func=lambda x: 'あり' if x else 'なし'
+                )
+
+
+        with st.container(border=True):
+            # Column type
+            col1, col2 = st.columns(2, vertical_alignment='center')
+
+            with col1:
+                st.write(':small[カラムの設定]')
+
+            with col2:
+                if is_header:
+                    is_scan_rows = st.toggle(
+                        label=':small[データから型を判定]',
+                        value=False
+                    )
+                else:
+                    is_scan_rows = False
+
+                max_scan_rows = 0
+                if is_scan_rows:
+                    max_scan_rows = st.number_input(
+                        label='読み取る行数',
+                        min_value=0,
+                        value=0,
+                        step=1,
+                        help='0 で全行を読み取り'
+                    )
+
+            if not is_scan_rows:
+                column_config_cols = {
+                    'Coln': st.column_config.NumberColumn(
+                        label='番号',
+                        disabled=True,
+                        required=True,
+                        format='Col%d',
+                        min_value=1,
+                        step=1
+                    ),
+                    'name': st.column_config.TextColumn(
+                        label='名称'
+                    ),
+                    'type': st.column_config.SelectboxColumn(
+                        label='型',
+                        options=[type.value for type in list(ColType)]
+                    ),
+                    'width': st.column_config.NumberColumn(
+                        label='長さ',
+                        min_value=1,
+                        step=1,
+                        help='固定長ファイルでは必須'
+                    ),
+                }
+
+                if 'df_cols' not in st.session_state:
+                    # Set df_cols in session_state
+                    initial_rows = 10
+                    data_cols = {
+                        'Coln': [i for i in range(1, initial_rows + 1)],
+                        'name': ['' for _ in range(initial_rows)],
+                        'type': ['' for _ in range(initial_rows)],
+                        'width': [np.nan for _ in range(initial_rows)]
+                    }
+                    df_cols = pd.DataFrame(data_cols)
+                    df_cols.loc[0, ['name', 'type']] = ['sample', 'Long']
+                    st.session_state['df_cols'] = df_cols
+
+                st.data_editor(
+                    data=st.session_state['df_cols'],
+                    hide_index=True,
+                    column_config=column_config_cols,
+                    num_rows='fixed',
+                    key='edited_cols',
+                    on_change=callback_apply_edited_rows,
+                    args=('edited_cols', 'df_cols')
+                )
+
+                col1, col2 = st.columns([0.15, 0.85])
+                with col1:
+                    if st.button(label=':material/add: 1'):
+                        add_row()
+                        st.rerun()
+                with col2:
+                    if st.button(label=':material/add: 10'):
+                        for _ in range(10):
+                            add_row()
+                        st.rerun()
+
+        with st.container(border=True):
             # Options
-            st.write(':material/Check: オプション')
+            st.write(':small[オプション]')
 
             with st.expander('値を指定'):
                 column_config_options = {
